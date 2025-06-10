@@ -5,9 +5,9 @@ import subprocess
 import semver
 
 # CONFIGURA ESTO 🔧
-REPO = "tuusuario/turepo"  # ← Cambia a tu repo real
+REPO = "Janiercraft/Programa"  # ← Cambia a tu repo real
 VERSION_FILE = "version.json"
-EXE_PATH = "dist/MiApp.exe"
+EXE_PATH = "dist/Calculadora R.Prestige.exe"
 EXE_NOMBRE = os.path.basename(EXE_PATH)
 
 # 📥 Cargar datos de versión
