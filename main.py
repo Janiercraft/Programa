@@ -15,5 +15,6 @@ else:
 init_local_db()
 init_local_tasas()
 
+__version__ = "1.0.0"
 # 3. Lanzar la interfaz gráfica
 LoginApp().run()
