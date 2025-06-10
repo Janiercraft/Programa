@@ -35,7 +35,7 @@ class CalculoScreen(Screen):
     pass
 
 class ResultadosScreen(Screen):
-    """Aquí inyectaremos dinámicamente el ResultadosWidget."""
+    """Aquí inyectaremos dinámicamente el ResultadosWidget.s"""
     pass
 
 # --- Clase principal de la aplicación ---
