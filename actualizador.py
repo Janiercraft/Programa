@@ -99,14 +99,13 @@ def is_newer(local, remote):
 def download_new_exe(url):
     r = requests.get(url, stream=True, timeout=30)
     r.raise_for_status()
-
-    # Directorio de temp
     fd, tmp_path = tempfile.mkstemp(suffix=".exe")
     os.close(fd)
     with open(tmp_path, "wb") as f:
         shutil.copyfileobj(r.raw, f)
 
-    print(f"[DEBUG] Nuevo exe descargado en: {tmp_path}")
+    print(f"[DEBUG] Nuevo ejecutable descargado en: {tmp_path}")
+    show_popup("Descarga completada", f"Nuevo archivo descargado en:\n{tmp_path}", duration=4)
     return tmp_path
 
 
@@ -114,24 +113,37 @@ def apply_update(new_exe_path):
     if not ensure_writable(CURRENT_EXE) or not ensure_writable(EXE_DIR):
         show_popup(
             "Error permisos",
-            "No se pueden escribir archivos aquí.\nEjecuta como admin o usa una carpeta de usuario.",
+            "No se pueden escribir archivos aquí.\nEjecuta como admin o instala en tu carpeta de usuario.",
             duration=4
         )
         return
 
-    # Limpia rollback previo
+    # Rollback guard: eliminamos cualquier .old previo
     if os.path.exists(OLD_EXE):
         os.remove(OLD_EXE)
 
-    # Renombra y reemplaza
-    os.rename(CURRENT_EXE, OLD_EXE)
-    shutil.copy(new_exe_path, CURRENT_EXE)
-    os.chmod(CURRENT_EXE, 0o755)
+    # Renombrar exe actual y copiar el nuevo
+    try:
+        os.rename(CURRENT_EXE, OLD_EXE)
+        print(f"[DEBUG] Ejecutable actual renombrado a: {OLD_EXE}")
+    except Exception as e:
+        print(f"[ERROR] No se pudo renombrar el actual a .old: {e}")
+        show_popup("Error", f"No se pudo hacer backup del ejecutable:\n{e}", duration=4)
+        return
 
-    show_popup("Actualizado", f"Nuevo exe en:\n{new_exe_path}\nReiniciando app...", duration=3)
+    try:
+        shutil.copy(new_exe_path, CURRENT_EXE)
+        os.chmod(CURRENT_EXE, 0o755)
+        print(f"[DEBUG] Nuevo ejecutable copiado a: {CURRENT_EXE}")
+    except Exception as e:
+        print(f"[ERROR] Falló al copiar el nuevo .exe: {e}")
+        show_popup("Error", f"No se pudo aplicar actualización:\n{e}", duration=4)
+        automatic_rollback()
+        return
+
+    show_popup("Actualizado", "Reiniciando app...", duration=2)
     subprocess.Popen([CURRENT_EXE])
     sys.exit()
-
 
 def check_for_updates():
     # 1) Rollback automático si queda un .old
