@@ -1,4 +1,10 @@
 {
+<<<<<<< HEAD:dist/Actualizador/_internal/version.json
   "version": "0.0.1",
   "url": "https://github.com/Janiercraft/Programa/releases/download/v0.0.1/Calculadora R.Prestige.zip"
 }
+=======
+  "version": "1.0.0",
+  "url": "https://github.com/Janiercraft/Programa/releases/download/v1.0.0/Calculadora.R.Prestige.zip"
+}
+>>>>>>> 604a4a5191b6d27d633d0764f91c2c9434039ebe:version.json
