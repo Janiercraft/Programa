@@ -1,7 +1,8 @@
 import os
+import sys
 from Clases_y_Funciones.Clases.gestion_recursos import Recursos
 from Clases_y_Funciones.Funciones.basesql import init_local_db, init_local_tasas
-from UX.Login import LoginApp
+from auto_updater import should_run_updater, AutoUpdaterApp
 
 # 1. Ruta a la base de datos local
 DB_PATH = Recursos.ruta('productos.db')
@@ -15,5 +16,9 @@ else:
 init_local_db()
 init_local_tasas()
 
-# 3. Lanzar la interfaz gráfica
-LoginApp().run()
+if not should_run_updater():
+    # should_run_updater ya lanzó LOCAL_EXE y hemos de salir
+    sys.exit(0)
+
+# 3. Si toca updater, arrancamos su interfaz
+AutoUpdaterApp().run()
