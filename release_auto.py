@@ -2,12 +2,14 @@ import os
 import sys
 import json
 import subprocess
+import shutil
 
 # CONFIGURA ESTO 🔧
 REPO = "Janiercraft/Programa"  # ← Cambia a tu repo real
 VERSION_FILE = "version.json"
-EXE_PATH = "dist/Calculadora R.Prestige.exe"
-EXE_NOMBRE = os.path.basename(EXE_PATH)
+ONEDIR_PATH = "dist/Calculadora R.Prestige"  # Carpeta generada por PyInstaller --onedir
+ZIP_BASE    = ONEDIR_PATH  # Se usará para crear ONEDIR_PATH.zip
+ZIP_PATH    = f"{ZIP_BASE}.zip"
 
 # 📥 Cargar datos de versión
 def load_version_data():
@@ -15,22 +17,17 @@ def load_version_data():
         print(f"❌ No se encontró {VERSION_FILE}")
         sys.exit(1)
 
-    with open(VERSION_FILE, "r") as f:
+    with open(VERSION_FILE, "r", encoding='utf-8') as f:
         data = json.load(f)
 
     if "version" not in data or "url" not in data:
-        print("❌ El archivo version.json debe contener 'version' y 'url'")
+        print("❌ El archivo version.json debe contener 'version' y 'url'.")
         sys.exit(1)
 
     return data
 
 # 🔢 Incrementar versión en esquema decimal (0–9) con carry
 def increment_version(version, tipo="patch", base=10):
-    """
-    - patch: sube patch; al llegar a base, resetea y bump minor.
-    - minor: sube minor; resetea patch; al llegar a base, resetea y bump major.
-    - major: sube major; resetea minor y patch.
-    """
     try:
         major, minor, patch = map(int, version.split("."))
     except ValueError:
@@ -51,7 +48,6 @@ def increment_version(version, tipo="patch", base=10):
     else:
         raise ValueError(f"Tipo de incremento inválido: {tipo}")
 
-    # Carry para minor → major
     if minor >= base:
         minor = 0
         major += 1
@@ -60,22 +56,39 @@ def increment_version(version, tipo="patch", base=10):
 
 # 📤 Guardar nueva versión y URL en version.json
 def save_version_data(version, url):
-    with open(VERSION_FILE, "w") as f:
-        json.dump({"version": version, "url": url}, f, indent=2)
+    with open(VERSION_FILE, "w", encoding='utf-8') as f:
+        json.dump({"version": version, "url": url}, f, indent=2, ensure_ascii=False)
     print(f"📝 version.json actualizado:\n - version: {version}\n - url: {url}")
+
+# 🗜️ Empaquetar carpeta onedir en ZIP
+def pack_onedir():
+    if not os.path.isdir(ONEDIR_PATH):
+        print(f"❌ No se encontró la carpeta onedir: {ONEDIR_PATH}")
+        sys.exit(1)
+    # Eliminar ZIP previo si existe
+    if os.path.exists(ZIP_PATH):
+        os.remove(ZIP_PATH)
+    # Crear ZIP
+    base = ZIP_BASE
+    try:
+        shutil.make_archive(base_name=base, format='zip', root_dir=ONEDIR_PATH)
+        print(f"🗜️ Carpeta comprimida como {ZIP_PATH}")
+    except Exception as e:
+        print(f"❌ Error al comprimir onedir: {e}")
+        sys.exit(1)
 
 # 🚀 Crear release en GitHub
 def crear_release(version, notas):
     tag = f"v{version}"
-    print(f"📦 Creando release {tag}...")
+    print(f"📦 Creando release {tag} y subiendo {ZIP_PATH}...")
 
-    if not os.path.isfile(EXE_PATH):
-        print(f"❌ No se encontró el ejecutable en: {EXE_PATH}")
+    if not os.path.isfile(ZIP_PATH):
+        print(f"❌ No se encontró el ZIP en: {ZIP_PATH}")
         sys.exit(1)
 
     comando = [
         "gh", "release", "create", tag,
-        EXE_PATH,
+        ZIP_PATH,
         "--repo", REPO,
         "--title", f"Versión {version}",
         "--notes", notas
@@ -88,13 +101,13 @@ def crear_release(version, notas):
         print(f"❌ Error al crear la release: {e}")
         sys.exit(1)
 
-# 🧠 Generar nueva URL para la descarga
+# 🌐 Generar nueva URL para el ZIP del release
 def generar_url(version):
     tag = f"v{version}"
-    exe_url_name = EXE_NOMBRE.replace(' ', '.')
-    return f"https://github.com/{REPO}/releases/download/{tag}/{exe_url_name}"
+    zip_name = os.path.basename(ZIP_PATH)
+    return f"https://github.com/{REPO}/releases/download/{tag}/{zip_name}"
 
-# 🏁 Main
+# 🏁 Main script
 if __name__ == "__main__":
     # 1. Cargar versión actual
     version_data = load_version_data()
@@ -111,9 +124,13 @@ if __name__ == "__main__":
         print("🚫 Operación cancelada.")
         sys.exit(0)
 
-    # 4. Crear release y actualizar version.json
+    # 4. Empaquetar carpeta
+    pack_onedir()
+
+    # 5. Generar URL y notas
     nueva_url = generar_url(new_version)
     notas = f"Auto-release generada para la versión {new_version}."
 
+    # 6. Crear release en GitHub y guardar version.json
     crear_release(new_version, notas)
     save_version_data(new_version, nueva_url)
