@@ -5,7 +5,6 @@ import time
 import requests
 import subprocess
 from pathlib import Path
-
 from kivy.app import App
 from kivy.clock import mainthread, Clock
 from kivy.properties import NumericProperty, StringProperty
@@ -15,13 +14,11 @@ from kivy.uix.label import Label
 from Clases_y_Funciones.Clases.gestion_recursos import Recursos
 
 # CONFIGURACIÓN
-VERSION_FILE = os.path.join(os.path.dirname(__file__), "version.json")
-DOWNLOAD_DIR = os.path.join(os.path.dirname(__file__), "updates")
+BASE_DIR      = Recursos.BASE_DIR        # el directorio raíz de tu proyecto
+VERSION_FILE  = os.path.join(BASE_DIR, "version.json")
 REMOTE_VERSION_URL = "https://raw.githubusercontent.com/Janiercraft/Programa/main/version.json"
-LOCAL_EXE = os.path.join(os.path.dirname(__file__), "dist", "Calculadora R.Prestige.exe")
-
-# Ahora el timestamp irá dentro de la carpeta Recursos
-TIMESTAMP_FILE = Recursos.ruta("last_check.json")
+LOCAL_EXE     = os.path.join(BASE_DIR, "dist", "Calculadora R.Prestige.exe")
+TIMESTAMP_FILE= Recursos.ruta("last_check.json")
 
 CHECK_INTERVAL = 3600  # segundos
 

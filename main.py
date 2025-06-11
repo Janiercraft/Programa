@@ -2,7 +2,7 @@ import os
 import sys
 from Clases_y_Funciones.Clases.gestion_recursos import Recursos
 from Clases_y_Funciones.Funciones.basesql import init_local_db, init_local_tasas
-from auto_updater import should_run_updater, AutoUpdaterApp
+from Clases_y_Funciones.Funciones.auto_updater import should_run_updater, AutoUpdaterApp
 
 # 1. Ruta a la base de datos local
 DB_PATH = Recursos.ruta('productos.db')
