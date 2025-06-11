@@ -11,6 +11,7 @@ from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.progressbar import ProgressBar
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
 
 # URL pública de tu version.json
 VERSION_JSON_URL = "https://raw.githubusercontent.com/Janiercraft/Programa/refs/heads/main/version.json"
@@ -103,8 +104,11 @@ def show_downloader_popup(download_url, apply_update_fn):
 
     def on_complete(tmp_path):
         Clock.unschedule(popup._ev)
-        popup.dismiss()
-        apply_update_fn(tmp_path)
+        print(f"[DEBUG] Nuevo exe descargado en: {tmp_path}")
+        popup.content.clear_widgets()
+        popup.content.add_widget(Label(text=f"Descargado en:\n{tmp_path}"))
+        Clock.schedule_once(lambda dt: (popup.dismiss(), apply_update_fn(tmp_path)), 2)
+
 
     def on_error(err):
         Clock.unschedule(popup._ev)
