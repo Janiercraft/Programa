@@ -91,7 +91,8 @@ def crear_release(version, notas):
 # 🧠 Generar nueva URL para la descarga
 def generar_url(version):
     tag = f"v{version}"
-    return f"https://github.com/{REPO}/releases/download/{tag}/{EXE_NOMBRE}"
+    exe_url_name = EXE_NOMBRE.replace(' ', '.')
+    return f"https://github.com/{REPO}/releases/download/{tag}/{exe_url_name}"
 
 # 🏁 Main
 if __name__ == "__main__":
