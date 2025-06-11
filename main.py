@@ -1,20 +1,19 @@
+import sys
 import os
-from Clases_y_Funciones.Clases.gestion_recursos import Recursos
-from Clases_y_Funciones.Funciones.basesql import init_local_db, init_local_tasas
-from UX.Login import LoginApp
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.clock import Clock
 
-# 1. Ruta a la base de datos local
-DB_PATH = Recursos.ruta('productos.db')
+import actualizador  # tu updater.py
 
-if not os.path.exists(DB_PATH):
-    print("[INFO] Base de datos local no encontrada. Creando archivo y esquema...")
-else:
-    print("[INFO] Base de datos encontrada. Verificando y migrando esquema...")
+class UpdateApp(App):
+    def build(self):
+        # Un widget vacío; la ventana servirá para mostrar popups del updater
+        return Widget()
 
-# Estas llamadas harán CREATE TABLE IF NOT EXISTS y ALTER TABLE
-init_local_db()
-init_local_tasas()
+    def on_start(self):
+        # Arrancamos el updater tras 0.1 s (para que la ventana ya exista)
+        Clock.schedule_once(lambda dt: actualizador.check_for_updates(), 0.1)
 
-__version__ = "1.0.0"
-# 3. Lanzar la interfaz gráfica
-LoginApp().run()
+if __name__ == "__main__":
+    UpdateApp().run()
