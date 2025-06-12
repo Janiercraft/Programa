@@ -1,3 +1,5 @@
+import os
+import sys
 from pathlib import Path
 from kivy.resources import resource_add_path
 
@@ -35,4 +37,18 @@ class Recursos:
         return str(cls.RECURSOS_DIR / nombre_archivo)
 
 # Inicializar recursos al importar
+def ruta_en_directorio_ejecutable(nombre_archivo):
+    """
+    Devuelve la ruta absoluta al archivo en el mismo directorio que el ejecutable.
+    Funciona también en modo onefile.
+    """
+    if getattr(sys, 'frozen', False):
+        # Modo empaquetado con PyInstaller
+        base_path = os.path.dirname(sys.executable)
+    else:
+        # Modo script normal
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    
+    return os.path.join(base_path, nombre_archivo)
+
 Recursos.init_kivy()

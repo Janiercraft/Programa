@@ -1,8 +1,8 @@
 import sqlite3, hashlib, json
-from Clases_y_Funciones.Clases.gestion_recursos import Recursos
+from Clases_y_Funciones.Clases.gestion_recursos import ruta_en_directorio_ejecutable
 
 # Ruta de la base local compartida
-DB_PATH = Recursos.ruta('productos.db')
+DB_PATH = ruta_en_directorio_ejecutable('productos.db')
 
 # ---------- Productos ----------
 def init_local_db():
