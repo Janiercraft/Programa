@@ -6,7 +6,7 @@ import subprocess
 # CONFIGURA ESTO 🔧
 REPO = "Janiercraft/Programa"  # ← Cambia a tu repo real
 VERSION_FILE = "version.json"
-EXE_PATH = "dist/Calculadora R.Prestige/Calculadora R.Prestige.exe"  # Ruta al .exe
+EXE_PATH = "dist/Calculadora R.Prestige.exe"  # Ruta correcta al .exe en dist/
 
 # 📥 Cargar datos de versión
 def load_version_data():
