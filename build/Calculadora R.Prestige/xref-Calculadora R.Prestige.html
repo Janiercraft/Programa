@@ -20,7 +20,6 @@
 imports:
     <a href="#Clases_y_Funciones.Clases.gestion_recursos">Clases_y_Funciones.Clases.gestion_recursos</a>
  &#8226;   <a href="#Clases_y_Funciones.Funciones.basesql">Clases_y_Funciones.Funciones.basesql</a>
- &#8226;   <a href="#Clases_y_Funciones.Funciones.versionsync">Clases_y_Funciones.Funciones.versionsync</a>
  &#8226;   <a href="#UX.Login">UX.Login</a>
  &#8226;   <a href="#_collections_abc">_collections_abc</a>
  &#8226;   <a href="#_weakrefset">_weakrefset</a>
@@ -155,7 +154,14 @@ imports:
  &#8226;   <a href="#genericpath">genericpath</a>
  &#8226;   <a href="#heapq">heapq</a>
  &#8226;   <a href="#io">io</a>
+ &#8226;   <a href="#json">json</a>
  &#8226;   <a href="#keyword">keyword</a>
+ &#8226;   <a href="#kivy.app">kivy.app</a>
+ &#8226;   <a href="#kivy.clock">kivy.clock</a>
+ &#8226;   <a href="#kivy.uix.boxlayout">kivy.uix.boxlayout</a>
+ &#8226;   <a href="#kivy.uix.button">kivy.uix.button</a>
+ &#8226;   <a href="#kivy.uix.label">kivy.uix.label</a>
+ &#8226;   <a href="#kivy.uix.popup">kivy.uix.popup</a>
  &#8226;   <a href="#linecache">linecache</a>
  &#8226;   <a href="#locale">locale</a>
  &#8226;   <a href="#ntpath">ntpath</a>
@@ -179,10 +185,14 @@ imports:
  &#8226;   <a href="#re._constants">re._constants</a>
  &#8226;   <a href="#re._parser">re._parser</a>
  &#8226;   <a href="#reprlib">reprlib</a>
+ &#8226;   <a href="#requests">requests</a>
+ &#8226;   <a href="#shutil">shutil</a>
  &#8226;   <a href="#sre_compile">sre_compile</a>
  &#8226;   <a href="#sre_constants">sre_constants</a>
  &#8226;   <a href="#sre_parse">sre_parse</a>
  &#8226;   <a href="#stat">stat</a>
+ &#8226;   <a href="#subprocess">subprocess</a>
+ &#8226;   <a href="#sys">sys</a>
  &#8226;   <a href="#traceback">traceback</a>
  &#8226;   <a href="#types">types</a>
  &#8226;   <a href="#warnings">warnings</a>
@@ -387,7 +397,6 @@ imported by:
 <span class="moduletype">MissingModule</span>  <div class="import">
 imported by:
     <a href="#pymongo.ocsp_support">pymongo.ocsp_support</a>
- &#8226;   <a href="#urllib3.contrib.pyopenssl">urllib3.contrib.pyopenssl</a>
 
   </div>
 
@@ -771,17 +780,6 @@ imported by:
 </div>
 
 <div class="node">
-  <a name="'pygame.joystick'"></a>
-  <a target="code" href="" type="text/plain"><tt>'pygame.joystick'</tt></a>
-<span class="moduletype">MissingModule</span>  <div class="import">
-imported by:
-    <a href="#kivy.input.providers.androidjoystick">kivy.input.providers.androidjoystick</a>
-
-  </div>
-
-</div>
-
-<div class="node">
   <a name="'pygame.scrap'"></a>
   <a target="code" href="" type="text/plain"><tt>'pygame.scrap'</tt></a>
 <span class="moduletype">MissingModule</span>  <div class="import">
@@ -1144,7 +1142,6 @@ imported by:
  &#8226;   <a href="#Clases_y_Funciones.Funciones.tasas">Clases_y_Funciones.Funciones.tasas</a>
  &#8226;   <a href="#Clases_y_Funciones.Funciones.usuario_local">Clases_y_Funciones.Funciones.usuario_local</a>
  &#8226;   <a href="#Clases_y_Funciones.Funciones.validar_dispositivo">Clases_y_Funciones.Funciones.validar_dispositivo</a>
- &#8226;   <a href="#Clases_y_Funciones.Funciones.versionsync">Clases_y_Funciones.Funciones.versionsync</a>
 
   </div>
 
@@ -1309,26 +1306,6 @@ imported by:
 </div>
 
 <div class="node">
-  <a name="Clases_y_Funciones.Funciones.versionsync"></a>
-  <a target="code" href="///C:/Users/janie/OneDrive/Escritorio/Programa/Programa/Clases_y_Funciones/Funciones/versionsync.py" type="text/plain"><tt>Clases_y_Funciones.Funciones.versionsync</tt></a>
-<span class="moduletype">SourceModule</span>  <div class="import">
-imports:
-    <a href="#Clases_y_Funciones.Funciones">Clases_y_Funciones.Funciones</a>
- &#8226;   <a href="#json">json</a>
- &#8226;   <a href="#pathlib">pathlib</a>
- &#8226;   <a href="#shutil">shutil</a>
- &#8226;   <a href="#sys">sys</a>
-
-  </div>
-  <div class="import">
-imported by:
-    <a href="#main.py">main.py</a>
-
-  </div>
-
-</div>
-
-<div class="node">
   <a name="ConfigParser"></a>
   <a target="code" href="" type="text/plain"><tt>ConfigParser</tt></a>
 <span class="moduletype">MissingModule</span>  <div class="import">
@@ -1380,6 +1357,7 @@ imported by:
 imported by:
     <a href="#pymongo.pyopenssl_context">pymongo.pyopenssl_context</a>
  &#8226;   <a href="#trio._dtls">trio._dtls</a>
+ &#8226;   <a href="#urllib3.contrib.pyopenssl">urllib3.contrib.pyopenssl</a>
 
   </div>
 
@@ -13110,6 +13088,7 @@ imports:
  &#8226;   <a href="#cryptography.hazmat.bindings.openssl._conditional">cryptography.hazmat.bindings.openssl._conditional</a>
  &#8226;   <a href="#cryptography.hazmat.bindings.openssl.binding">cryptography.hazmat.bindings.openssl.binding</a>
  &#8226;   <a href="#cryptography.utils">cryptography.utils</a>
+ &#8226;   <a href="#cryptography.x509">cryptography.x509</a>
  &#8226;   <a href="#sys">sys</a>
  &#8226;   <a href="#warnings">warnings</a>
 
@@ -14325,7 +14304,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#cryptography.x509">cryptography.x509</a>
+    <a href="#cryptography">cryptography</a>
+ &#8226;   <a href="#cryptography.x509">cryptography.x509</a>
  &#8226;   <a href="#cryptography.x509.base">cryptography.x509.base</a>
  &#8226;   <a href="#cryptography.x509.certificate_transparency">cryptography.x509.certificate_transparency</a>
  &#8226;   <a href="#cryptography.x509.extensions">cryptography.x509.extensions</a>
@@ -25669,6 +25649,7 @@ imported by:
 <span class="moduletype">Package</span>  <div class="import">
 imports:
     <a href="#enum">enum</a>
+ &#8226;   <a href="#http.cookiejar">http.cookiejar</a>
 
   </div>
   <div class="import">
@@ -25742,7 +25723,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#requests.compat">requests.compat</a>
+    <a href="#http">http</a>
+ &#8226;   <a href="#requests.compat">requests.compat</a>
  &#8226;   <a href="#urllib.request">urllib.request</a>
 
   </div>
@@ -27198,7 +27180,6 @@ imports:
   <div class="import">
 imported by:
     <a href="#Clases_y_Funciones.Funciones.basesql">Clases_y_Funciones.Funciones.basesql</a>
- &#8226;   <a href="#Clases_y_Funciones.Funciones.versionsync">Clases_y_Funciones.Funciones.versionsync</a>
  &#8226;   <a href="#_pytest.cacheprovider">_pytest.cacheprovider</a>
  &#8226;   <a href="#bson.json_util">bson.json_util</a>
  &#8226;   <a href="#charset_normalizer.models">charset_normalizer.models</a>
@@ -27211,6 +27192,7 @@ imported by:
  &#8226;   <a href="#kivy.uix.settings">kivy.uix.settings</a>
  &#8226;   <a href="#kivy.uix.videoplayer">kivy.uix.videoplayer</a>
  &#8226;   <a href="#kivy.uix.vkeyboard">kivy.uix.vkeyboard</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#numpy.__config__">numpy.__config__</a>
  &#8226;   <a href="#numpy.testing._private.utils">numpy.testing._private.utils</a>
  &#8226;   <a href="#pymongo._azure_helpers">pymongo._azure_helpers</a>
@@ -27709,6 +27691,7 @@ imported by:
  &#8226;   <a href="#kivy.uix.textinput">kivy.uix.textinput</a>
  &#8226;   <a href="#kivy.uix.treeview">kivy.uix.treeview</a>
  &#8226;   <a href="#kivy.uix.video">kivy.uix.video</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -27898,6 +27881,7 @@ imported by:
  &#8226;   <a href="#kivy.uix.video">kivy.uix.video</a>
  &#8226;   <a href="#kivy.uix.videoplayer">kivy.uix.videoplayer</a>
  &#8226;   <a href="#kivy.uix.vkeyboard">kivy.uix.vkeyboard</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -30442,8 +30426,7 @@ imported by:
   <a target="code" href="///C:/Users/janie/AppData/Local/Programs/Python/Python313/Lib/site-packages/kivy/input/providers/androidjoystick.py" type="text/plain"><tt>kivy.input.providers.androidjoystick</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#'pygame.joystick'">'pygame.joystick'</a>
- &#8226;   <a href="#android">android</a>
+    <a href="#android">android</a>
  &#8226;   <a href="#kivy.core.window">kivy.core.window</a>
  &#8226;   <a href="#kivy.input.factory">kivy.input.factory</a>
  &#8226;   <a href="#kivy.input.motionevent">kivy.input.motionevent</a>
@@ -30452,6 +30435,7 @@ imports:
  &#8226;   <a href="#kivy.input.shape">kivy.input.shape</a>
  &#8226;   <a href="#kivy.logger">kivy.logger</a>
  &#8226;   <a href="#os">os</a>
+ &#8226;   <a href="#pygame">pygame</a>
 
   </div>
   <div class="import">
@@ -31800,6 +31784,7 @@ imported by:
  &#8226;   <a href="#kivy.uix.settings">kivy.uix.settings</a>
  &#8226;   <a href="#kivy.uix.splitter">kivy.uix.splitter</a>
  &#8226;   <a href="#kivy.uix.textinput">kivy.uix.textinput</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -31861,6 +31846,7 @@ imported by:
  &#8226;   <a href="#kivy.uix.spinner">kivy.uix.spinner</a>
  &#8226;   <a href="#kivy.uix.splitter">kivy.uix.splitter</a>
  &#8226;   <a href="#kivy.uix.togglebutton">kivy.uix.togglebutton</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -32222,6 +32208,7 @@ imported by:
  &#8226;   <a href="#kivy.uix.treeview">kivy.uix.treeview</a>
  &#8226;   <a href="#kivy.uix.videoplayer">kivy.uix.videoplayer</a>
  &#8226;   <a href="#kivy.uix.vkeyboard">kivy.uix.vkeyboard</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -32320,6 +32307,7 @@ imported by:
     <a href="#UX.Login">UX.Login</a>
  &#8226;   <a href="#kivy">kivy</a>
  &#8226;   <a href="#kivy.uix.settings">kivy.uix.settings</a>
+ &#8226;   <a href="#main.py">main.py</a>
 
   </div>
 
@@ -42269,7 +42257,6 @@ imports:
   <div class="import">
 imported by:
     <a href="#Clases_y_Funciones.Clases.gestion_recursos">Clases_y_Funciones.Clases.gestion_recursos</a>
- &#8226;   <a href="#Clases_y_Funciones.Funciones.versionsync">Clases_y_Funciones.Funciones.versionsync</a>
  &#8226;   <a href="#_pytest._code.code">_pytest._code.code</a>
  &#8226;   <a href="#_pytest.assertion.rewrite">_pytest.assertion.rewrite</a>
  &#8226;   <a href="#_pytest.cacheprovider">_pytest.cacheprovider</a>
@@ -43554,6 +43541,7 @@ imported by:
  &#8226;   <a href="#kivy.core.image.img_pygame">kivy.core.image.img_pygame</a>
  &#8226;   <a href="#kivy.core.text.text_pygame">kivy.core.text.text_pygame</a>
  &#8226;   <a href="#kivy.core.window.window_pygame">kivy.core.window.window_pygame</a>
+ &#8226;   <a href="#kivy.input.providers.androidjoystick">kivy.input.providers.androidjoystick</a>
  &#8226;   <a href="#kivy.support">kivy.support</a>
 
   </div>
@@ -56072,7 +56060,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#pymongo.ocsp_support">pymongo.ocsp_support</a>
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#pymongo.ocsp_support">pymongo.ocsp_support</a>
  &#8226;   <a href="#requests">requests</a>
  &#8226;   <a href="#requests.__version__">requests.__version__</a>
  &#8226;   <a href="#requests._internal_utils">requests._internal_utils</a>
@@ -60259,8 +60248,7 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#Clases_y_Funciones.Funciones.versionsync">Clases_y_Funciones.Funciones.versionsync</a>
- &#8226;   <a href="#PIL.EpsImagePlugin">PIL.EpsImagePlugin</a>
+    <a href="#PIL.EpsImagePlugin">PIL.EpsImagePlugin</a>
  &#8226;   <a href="#PIL.ImageShow">PIL.ImageShow</a>
  &#8226;   <a href="#_pytest._io.terminalwriter">_pytest._io.terminalwriter</a>
  &#8226;   <a href="#_pytest._py.path">_pytest._py.path</a>
@@ -60274,6 +60262,7 @@ imported by:
  &#8226;   <a href="#dotenv.main">dotenv.main</a>
  &#8226;   <a href="#http.server">http.server</a>
  &#8226;   <a href="#kivy">kivy</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.util">multiprocessing.util</a>
  &#8226;   <a href="#numpy.f2py._backends._distutils">numpy.f2py._backends._distutils</a>
  &#8226;   <a href="#numpy.f2py._backends._meson">numpy.f2py._backends._meson</a>
@@ -61214,6 +61203,7 @@ imported by:
  &#8226;   <a href="#kivy.core.clipboard.clipboard_xclip">kivy.core.clipboard.clipboard_xclip</a>
  &#8226;   <a href="#kivy.core.clipboard.clipboard_xsel">kivy.core.clipboard.clipboard_xsel</a>
  &#8226;   <a href="#kivy.input.providers.probesysfs">kivy.input.providers.probesysfs</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#multiprocessing.popen_spawn_win32">multiprocessing.popen_spawn_win32</a>
  &#8226;   <a href="#multiprocessing.util">multiprocessing.util</a>
  &#8226;   <a href="#numpy.f2py">numpy.f2py</a>
@@ -61251,7 +61241,6 @@ imported by:
   <tt>sys</tt> <span class="moduletype"><i>(builtin module)</i></span>  <div class="import">
 imported by:
     <a href="#Clases_y_Funciones.Clases.gestion_recursos">Clases_y_Funciones.Clases.gestion_recursos</a>
- &#8226;   <a href="#Clases_y_Funciones.Funciones.versionsync">Clases_y_Funciones.Funciones.versionsync</a>
  &#8226;   <a href="#PIL.DdsImagePlugin">PIL.DdsImagePlugin</a>
  &#8226;   <a href="#PIL.EpsImagePlugin">PIL.EpsImagePlugin</a>
  &#8226;   <a href="#PIL.IcnsImagePlugin">PIL.IcnsImagePlugin</a>
@@ -61438,6 +61427,7 @@ imported by:
  &#8226;   <a href="#linecache">linecache</a>
  &#8226;   <a href="#locale">locale</a>
  &#8226;   <a href="#logging">logging</a>
+ &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#mimetypes">mimetypes</a>
  &#8226;   <a href="#multiprocessing">multiprocessing</a>
  &#8226;   <a href="#multiprocessing.connection">multiprocessing.connection</a>
@@ -66167,8 +66157,8 @@ imported by:
   <a target="code" href="///C:/Users/janie/AppData/Local/Programs/Python/Python313/Lib/site-packages/urllib3/contrib/pyopenssl.py" type="text/plain"><tt>urllib3.contrib.pyopenssl</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imports:
-    <a href="#'OpenSSL.SSL'">'OpenSSL.SSL'</a>
- &#8226;   <a href="#'OpenSSL.crypto'">'OpenSSL.crypto'</a>
+    <a href="#'OpenSSL.crypto'">'OpenSSL.crypto'</a>
+ &#8226;   <a href="#OpenSSL">OpenSSL</a>
  &#8226;   <a href="#__future__">__future__</a>
  &#8226;   <a href="#cryptography">cryptography</a>
  &#8226;   <a href="#cryptography.x509">cryptography.x509</a>

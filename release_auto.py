@@ -2,14 +2,11 @@ import os
 import sys
 import json
 import subprocess
-import shutil
 
 # CONFIGURA ESTO 🔧
 REPO = "Janiercraft/Programa"  # ← Cambia a tu repo real
 VERSION_FILE = "version.json"
-ONEDIR_PATH = "dist/Calculadora R.Prestige"  # Carpeta generada por PyInstaller --onedir
-ZIP_BASE    = ONEDIR_PATH  # Se usará para crear ONEDIR_PATH.zip
-ZIP_PATH    = f"{ZIP_BASE}.zip"
+EXE_PATH = "dist/Calculadora R.Prestige/Calculadora R.Prestige.exe"  # Ruta al .exe
 
 # 📥 Cargar datos de versión
 def load_version_data():
@@ -60,35 +57,18 @@ def save_version_data(version, url):
         json.dump({"version": version, "url": url}, f, indent=2, ensure_ascii=False)
     print(f"📝 version.json actualizado:\n - version: {version}\n - url: {url}")
 
-# 🗜️ Empaquetar carpeta onedir en ZIP
-def pack_onedir():
-    if not os.path.isdir(ONEDIR_PATH):
-        print(f"❌ No se encontró la carpeta onedir: {ONEDIR_PATH}")
-        sys.exit(1)
-    # Eliminar ZIP previo si existe
-    if os.path.exists(ZIP_PATH):
-        os.remove(ZIP_PATH)
-    # Crear ZIP
-    base = ZIP_BASE
-    try:
-        shutil.make_archive(base_name=base, format='zip', root_dir=ONEDIR_PATH)
-        print(f"🗜️ Carpeta comprimida como {ZIP_PATH}")
-    except Exception as e:
-        print(f"❌ Error al comprimir onedir: {e}")
-        sys.exit(1)
-
-# 🚀 Crear release en GitHub
+# 🚀 Crear release en GitHub subiendo el .exe
 def crear_release(version, notas):
     tag = f"v{version}"
-    print(f"📦 Creando release {tag} y subiendo {ZIP_PATH}...")
+    print(f"📦 Creando release {tag} y subiendo {EXE_PATH}...")
 
-    if not os.path.isfile(ZIP_PATH):
-        print(f"❌ No se encontró el ZIP en: {ZIP_PATH}")
+    if not os.path.isfile(EXE_PATH):
+        print(f"❌ No se encontró el ejecutable en: {EXE_PATH}")
         sys.exit(1)
 
     comando = [
         "gh", "release", "create", tag,
-        ZIP_PATH,
+        EXE_PATH,
         "--repo", REPO,
         "--title", f"Versión {version}",
         "--notes", notas
@@ -101,11 +81,11 @@ def crear_release(version, notas):
         print(f"❌ Error al crear la release: {e}")
         sys.exit(1)
 
-# 🌐 Generar nueva URL para el ZIP del release
+# 🌐 Generar nueva URL para el .exe del release
 def generar_url(version):
     tag = f"v{version}"
-    zip_name = os.path.basename(ZIP_PATH)
-    return f"https://github.com/{REPO}/releases/download/{tag}/{zip_name}"
+    exe_name = os.path.basename(EXE_PATH)
+    return f"https://github.com/{REPO}/releases/download/{tag}/{exe_name}"
 
 # 🏁 Main script
 if __name__ == "__main__":
@@ -124,13 +104,10 @@ if __name__ == "__main__":
         print("🚫 Operación cancelada.")
         sys.exit(0)
 
-    # 4. Empaquetar carpeta
-    pack_onedir()
-
-    # 5. Generar URL y notas
-    nueva_url = generar_url(new_version)
+    # 4. Crear release en GitHub y generar URL
     notas = f"Auto-release generada para la versión {new_version}."
-
-    # 6. Crear release en GitHub y guardar version.json
     crear_release(new_version, notas)
+    nueva_url = generar_url(new_version)
+
+    # 5. Guardar version.json
     save_version_data(new_version, nueva_url)
