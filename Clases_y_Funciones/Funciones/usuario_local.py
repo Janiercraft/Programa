@@ -5,10 +5,10 @@ import base64
 import hashlib
 from datetime import datetime, timedelta
 from cryptography.fernet import Fernet
-from Clases_y_Funciones.Clases.gestion_recursos import ruta_en_directorio_ejecutable
+from Clases_y_Funciones.Clases.gestion_recursos import RecursosExternos
 
 # Ruta absoluta para usuarios.db (en la carpeta de Recursos)
-DB_PATH = ruta_en_directorio_ejecutable("usuarios.db")
+DB_PATH = RecursosExternos.ruta("usuarios.db")
 
 # === 1. Clave Fernet derivada del usuario ===
 def generar_clave_fernet(usuario: str) -> bytes:
