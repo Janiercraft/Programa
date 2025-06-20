@@ -1,4 +1,5 @@
 import hashlib
+import uuid
 import platform
 import subprocess
 from typing import Tuple
@@ -59,7 +60,6 @@ def obtener_fingerprint_hw() -> str:
     else:
         # Fallback: utiliza el MAC (getnode) o nodo del host
         try:
-            import uuid
             raw = str(uuid.getnode())
         except Exception:
             raw = platform.node()
