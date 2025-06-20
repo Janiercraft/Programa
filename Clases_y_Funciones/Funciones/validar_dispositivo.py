@@ -67,7 +67,7 @@ def validar_credenciales_y_dispositivo(
             # Guardar login local para refrescar fecha de último login online
             guardar_login_local(email_usuario, contrasena)
             con.close()
-            return True, "Acceso permitido. Dispositivo ya registrado."
+            return True, "Acceso permitido."
 
         # 2.5) Si hay espacio para registrar un nuevo dispositivo
         if len(dispositivos_registrados) < total_permitidos:

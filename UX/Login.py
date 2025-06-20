@@ -11,6 +11,8 @@ from kivy.graphics import Rectangle
 from Clases_y_Funciones.Clases.tema_sistema import obtener_ruta_fondo, obtener_color_texto
 from Clases_y_Funciones.Funciones.validar_dispositivo import validar_credenciales_y_dispositivo
 from UX.Calculadora import MiApp
+from kivy.metrics import dp
+from kivy.clock import Clock
 import sys
 
 # Redimensionar la ventana
@@ -46,7 +48,7 @@ class LoginLayout(FloatLayout):
         self.input_usuario = TextInput(
             multiline=False,
             size_hint=(.6, .15),
-            pos_hint={"x": 0.3, "y": 0.725},
+            pos_hint={"x": 0.31, "y": 0.725},
             foreground_color=color_texto,
             background_color=(0, 0, 0, 0.3)  # semi-transparente
         )
@@ -66,7 +68,7 @@ class LoginLayout(FloatLayout):
         self.input_contrasena = TextInput(
             multiline=False,
             size_hint=(.6, .15),
-            pos_hint={"x": 0.3, "y": 0.477},
+            pos_hint={"x": 0.31, "y": 0.477},
             foreground_color=color_texto,
             background_color=(0, 0, 0, 0.3)
         )
@@ -80,6 +82,8 @@ class LoginLayout(FloatLayout):
         )
         self.add_widget(self.boton_ingresar)
         self.boton_ingresar.bind(on_release=self.intentar_ingresar)
+        Window.bind(size=self._redimensionar_fuentes)
+        Clock.schedule_once(lambda dt: self._redimensionar_fuentes(Window, Window.size), 0)
 
     def intentar_ingresar(self, instance):
         email = self.input_usuario.text.strip()
@@ -92,13 +96,29 @@ class LoginLayout(FloatLayout):
         popup.open()
 
         if ok:
-            App.get_running_app().stop()
-            MiApp().run()
-            sys.exit(0)
+            Clock.schedule_once(lambda dt: self._lanzar_calculadora(popup), 5)
+
+    def _lanzar_calculadora(self, popup):
+        App.get_running_app().stop()
+        MiApp().run()
+        sys.exit(0)
 
     def actualizar_fondo(self, *args):
         self.fondo.pos = self.pos
         self.fondo.size = self.size
+
+    def _redimensionar_fuentes(self, window, size):
+        width, height = size
+        # Usa un % del alto en lugar del ancho para que no crezca demasiado
+        font_label  = height * 0.06   # 18% de la altura de ventana
+        font_input  = height * 0.06   # 16%
+        font_button = height * 0.08   # 20%
+
+        self.label_usuario.font_size    = dp(font_label)
+        self.label_contrasena.font_size = dp(font_label)
+        self.input_usuario.font_size    = dp(font_input)
+        self.input_contrasena.font_size = dp(font_input)
+        self.boton_ingresar.font_size   = dp(font_button)
 
 class LoginApp(App):
     def build(self):

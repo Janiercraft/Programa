@@ -5,8 +5,9 @@ import shutil
 import requests
 import subprocess
 from pathlib import Path
-from kivy.app import App
+from kivy.metrics import sp
 from kivy.clock import Clock
+from kivy.core.window import Window
 from kivy.uix.popup import Popup
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
@@ -14,6 +15,12 @@ from kivy.uix.button import Button
 from Clases_y_Funciones.Clases.gestion_recursos import Recursos, RecursosExternos
 from Clases_y_Funciones.Funciones.basesql import init_local_db, init_local_tasas
 from UX.Login import LoginApp
+from kivy.uix.anchorlayout import AnchorLayout
+
+# —––––––––––––––––––––––––––––––––––––––––––––––––––—
+# Configuración inicial de la ventana principal
+# —––––––––––––––––––––––––––––––––––––––––––––––––––—
+Window.title = "Mi Calculadora R.Prestige"   # Título personalizado
 
 # URL raw de tu version.json en GitHub
 REMOTE_VERSION_JSON = (
@@ -21,15 +28,9 @@ REMOTE_VERSION_JSON = (
 )
 
 def leer_json_interno():
-    """
-    Lee el version.json que está en la raíz del bundle (sys._MEIPASS)
-    o en la carpeta del proyecto junto a main.py si no está frozen.
-    """
     if getattr(sys, "frozen", False):
-        # Modo onefile: version.json está en la raíz de _MEIPASS
         path = Path(sys._MEIPASS) / "version.json"
     else:
-        # Modo desarrollo: version.json junto a main.py
         path = Path(__file__).parent / "version.json"
 
     if not path.exists():
@@ -42,43 +43,94 @@ def leer_json_remoto():
     return resp.json()
 
 def lanzar_updater():
-    # Usamos RecursosExternos.ruta para localizar updater.exe en recursos externos
     updater_path = Path(RecursosExternos.ruta("updater.exe"))
     if updater_path.exists():
-        subprocess.Popen([str(updater_path), "--update"], cwd=str(updater_path.parent))
+        subprocess.Popen(
+            [str(updater_path), "--update"],
+            cwd=str(updater_path.parent)
+        )
     sys.exit(0)
 
 def mostrar_popup_actualizacion(local_v, remote_v):
-    content = BoxLayout(orientation="vertical", spacing=10, padding=10)
+    def get_responsive_font_size(base_sp=16):
+        scale = Window.width / 500.0
+        return sp(base_sp * scale)
+
+    content = BoxLayout(
+        orientation="vertical",
+        spacing=10,
+        padding=10,
+    )
+
+    # Usar anchor_x y anchor_y en lugar de anchor
+    msg_container = AnchorLayout(
+        size_hint=(1, 1),
+        anchor_x='center',
+        anchor_y='center',
+    )
+
     msg = Label(
         text=(
-            f"Hay una nueva versión disponible:\n\n"
+            f"Hay una nueva versión disponible:\n"
             f"Actual: {local_v}\n"
             f"Nueva:  {remote_v}"
         ),
-        halign="center"
+        halign="center",
+        valign="middle",
+        size_hint=(None, None),
+        font_size=get_responsive_font_size(12),
     )
-    btns = BoxLayout(size_hint_y=None, height="40dp", spacing=10)
-    btn_si = Button(text="Sí, actualizar")
-    btn_no = Button(text="No, gracias")
+    def _update_size(label, _):
+        label.size = label.texture_size
+    msg.bind(texture_size=_update_size)
+
+    msg_container.add_widget(msg)
+    content.add_widget(msg_container)
+
+    btns = BoxLayout(size_hint=(1, None), height="40dp", spacing=10)
+    btn_si = Button(text="Sí, actualizar", size_hint=(0.5, 1),
+                    font_size=get_responsive_font_size(12))
+    btn_no = Button(text="No, gracias", size_hint=(0.5, 1),
+                    font_size=get_responsive_font_size(12))
     btns.add_widget(btn_si)
     btns.add_widget(btn_no)
-
-    content.add_widget(msg)
     content.add_widget(btns)
 
     popup = Popup(
         title="Actualización disponible",
         content=content,
-        size_hint=(0.75, 0.5),
+        size_hint=(0.5, 0.86),
         auto_dismiss=False
     )
+    popup.title_size = get_responsive_font_size(14)
+
+    def _on_window_resize(*_):
+        fs = get_responsive_font_size
+        msg.font_size = fs(12)
+        btn_si.font_size = fs(10)
+        btn_no.font_size = fs(10)
+        try:
+            popup.title_size = fs(14)
+        except AttributeError:
+            popup._title_label.font_size = fs(14)
+        msg.texture_update()
+
+    Window.bind(on_resize=_on_window_resize)
 
     btn_si.bind(on_release=lambda *a: (popup.dismiss(), lanzar_updater()))
     btn_no.bind(on_release=lambda *a: popup.dismiss())
     popup.open()
 
 class MainApp(LoginApp):
+    # También se puede usar este atributo:
+    title = "Mi Calculadora R.Prestige"
+
+    def build(self):
+        # Si LoginApp define build(), lo llamamos para inicializar la UI
+        root = super().build()
+        Window.title = self.title
+        return root
+
     def on_start(self):
         if hasattr(super(), "on_start"):
             super().on_start()
@@ -101,7 +153,6 @@ def main():
     RecursosExternos.init_kivy()
 
     # 2) Extrae updater.exe de la carpeta Recursos interna a la carpeta externa
-    # Interno: Resources bajo el bundle o bajo el repo
     if getattr(sys, "frozen", False):
         internal_res_dir = Path(sys._MEIPASS) / "Recursos"
     else:
