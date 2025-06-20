@@ -1,4 +1,6 @@
-import uuid
+import hashlib
+import platform
+import subprocess
 from typing import Tuple
 from pymongo.errors import PyMongoError
 from Clases_y_Funciones.Clases.Conexion_Mongo import Conexion_Mongo
@@ -6,6 +8,62 @@ from Clases_y_Funciones.Funciones.usuario_local import (
     guardar_login_local,
     verificar_login_offline
 )
+
+
+def obtener_machine_id() -> str:
+    """
+    Obtiene un identificador único del sistema operativo:
+    - Linux: /etc/machine-id o /var/lib/dbus/machine-id
+    - Windows: registro MachineGuid
+    - macOS (Darwin): IOPlatformUUID
+    Si no está disponible, retorna cadena vacía.
+    """
+    so = platform.system()
+    try:
+        if so == "Linux":
+            for path in ("/etc/machine-id", "/var/lib/dbus/machine-id"):
+                try:
+                    with open(path, "r") as f:
+                        val = f.read().strip()
+                        if val:
+                            return val
+                except FileNotFoundError:
+                    continue
+        elif so == "Windows":
+            # lee desde el registro MachineGuid
+            cmd = ["reg", "query",
+                   r"HKLM\SOFTWARE\Microsoft\Cryptography",
+                   "/v", "MachineGuid"]
+            salida = subprocess.check_output(cmd, text=True, stderr=subprocess.DEVNULL)
+            return salida.strip().split()[-1]
+        elif so == "Darwin":  # macOS
+            cmd = ["ioreg", "-rd1", "-c", "IOPlatformExpertDevice"]
+            salida = subprocess.check_output(cmd, text=True, stderr=subprocess.DEVNULL)
+            for line in salida.splitlines():
+                if "IOPlatformUUID" in line:
+                    return line.split('=')[1].strip().strip('"')
+    except Exception:
+        pass
+    return ""
+
+
+def obtener_fingerprint_hw() -> str:
+    """
+    Genera un fingerprint estable basado en machine-id del SO.
+    Si no está disponible, hace fallback a uuid.getnode().
+    Siempre devuelve un SHA-256 hexdigest de ese valor.
+    """
+    mid = obtener_machine_id()
+    if mid:
+        raw = mid
+    else:
+        # Fallback: utiliza el MAC (getnode) o nodo del host
+        try:
+            import uuid
+            raw = str(uuid.getnode())
+        except Exception:
+            raw = platform.node()
+    return hashlib.sha256(raw.encode()).hexdigest()
 
 
 def validar_credenciales_y_dispositivo(
@@ -28,9 +86,9 @@ def validar_credenciales_y_dispositivo(
              • Si retorna False → error offline (ya incluye mensaje).
     """
 
-    # 1) Obtener ID de dispositivo si no se pasó
+    # 1) Obtener fingerprint si no se pasó explícitamente
     if dispositivo_actual is None:
-        dispositivo_actual = str(uuid.getnode())
+        dispositivo_actual = obtener_fingerprint_hw()
 
     # 2) Intentar validación online en MongoDB
     try:
@@ -38,60 +96,45 @@ def validar_credenciales_y_dispositivo(
         usuarios_col = con.get_collection(collection_name="usuarios")
         planes_col   = con.get_collection(collection_name="planes")
 
-        # 2.1) Buscar el usuario por email
         usuario_doc = usuarios_col.find_one({"email": email_usuario})
         if not usuario_doc:
             con.close()
             return False, "Usuario no encontrado."
 
-        # 2.2) Verificar contraseña (campo “contraseña” en tu colección)
-        password_almacenada = usuario_doc.get("contraseña", "")
-        if contrasena != password_almacenada:
+        if contrasena != usuario_doc.get("contraseña", ""):
             con.close()
             return False, "Contraseña incorrecta."
 
-        # 2.3) Obtener dispositivos registrados y plan
         dispositivos_registrados = usuario_doc.get("dispositivos_registrados", [])
-        plan_id = usuario_doc.get("plan")
-        plan_usuario = planes_col.find_one({"_id": plan_id})
-        if not plan_usuario:
+        plan_doc = planes_col.find_one({"_id": usuario_doc.get("plan")})
+        if not plan_doc:
             con.close()
-            return False, "Error: El plan del usuario no existe en la base de datos."
+            return False, "Error: el plan del usuario no existe."
 
-        max_base  = plan_usuario.get("max_dispositivos", 1)
-        max_extra = usuario_doc.get("max_dispositivos_extra", 0)
-        total_permitidos = max_base + max_extra
+        total_permitidos = plan_doc.get("max_dispositivos", 1) + usuario_doc.get("max_dispositivos_extra", 0)
 
-        # 2.4) Si el dispositivo ya estaba registrado
         if dispositivo_actual in dispositivos_registrados:
-            # Guardar login local para refrescar fecha de último login online
             guardar_login_local(email_usuario, contrasena)
             con.close()
             return True, "Acceso permitido."
 
-        # 2.5) Si hay espacio para registrar un nuevo dispositivo
         if len(dispositivos_registrados) < total_permitidos:
             dispositivos_registrados.append(dispositivo_actual)
             usuarios_col.update_one(
                 {"email": email_usuario},
                 {"$set": {"dispositivos_registrados": dispositivos_registrados}}
             )
-            # Guardar login local
             guardar_login_local(email_usuario, contrasena)
             con.close()
             return True, f"Dispositivo registrado correctamente ({dispositivo_actual})."
 
-        # 2.6) Si no hay espacio
         con.close()
-        return False, "Límite de dispositivos alcanzado. No puedes iniciar sesión desde este dispositivo."
+        return False, "Límite de dispositivos alcanzado."
 
     except (ConnectionError, PyMongoError):
-        # 3) Si falla la conexión a Mongo (offline) → ruta offline
-        ok_offline, msg_offline = verificar_login_offline(email_usuario, contrasena)
-        return ok_offline, msg_offline
+        return verificar_login_offline(email_usuario, contrasena)
 
     finally:
-        # Asegurar que la conexión se cierra en caso de excepción no prevista
         try:
             con.close()
         except Exception:
