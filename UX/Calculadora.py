@@ -368,12 +368,14 @@ class MiWidget(Widget):
         self.btn_plus.bind(on_release=self.agregar_par)
         self.btn_minus.bind(on_release=self.eliminar_par)
         
+        """
         # --------------------- Botón de Configuración adaptable ---------------------
         self.btn_config = Button(text="⚙", font_name=Recursos.ruta('DejaVuSans.ttf'), font_size=30, size_hint=(None, None), size=(30, 30))
         self.add_widget(self.btn_config)
         Window.bind(on_resize=self.actualizar_config_btn)
         self.actualizar_config_btn(Window, Window.width, Window.height)
-    
+        """
+        
     # Bind al toggle para mostrar u ocultar el date_input y el monto_input
     def on_toggle_fecha(self, instance, value):
         if value == "down":
@@ -457,7 +459,7 @@ class MiWidget(Widget):
             for w in (self.label_F_P_Adicional, self.label_M_P_Adicional, self.deposito_label, self.P_total_label):
                 if w.parent:
                     self.remove_widget(w)
-
+    """
     def actualizar_config_btn(self, instance, width, height):
         scale_x = width / ANCHO_INICIAL
         scale_y = height / ALTO_INICIAL
@@ -468,7 +470,7 @@ class MiWidget(Widget):
         self.btn_config.size = (new_width, new_height)
         self.btn_config.pos = (margin_x, margin_y)
         self.btn_config.font_size = int(min(new_width, new_height) * 0.8)
-
+    """
     def on_codigo_seleccionado(self, codigo):
         if codigo in self.mapping:
             self.descripcion_input.text = self.mapping[codigo]

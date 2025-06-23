@@ -20,7 +20,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 # —––––––––––––––––––––––––––––––––––––––––––––––––––—
 # Configuración inicial de la ventana principal
 # —––––––––––––––––––––––––––––––––––––––––––––––––––—
-Window.title = "Mi Calculadora R.Prestige"   # Título personalizado
+Window.title = "Calculadora R.Prestige"   # Título personalizado
 
 # URL raw de tu version.json en GitHub
 REMOTE_VERSION_JSON = (
@@ -123,7 +123,7 @@ def mostrar_popup_actualizacion(local_v, remote_v):
 
 class MainApp(LoginApp):
     # También se puede usar este atributo:
-    title = "Mi Calculadora R.Prestige"
+    title = "Calculadora R.Prestige"
 
     def build(self):
         # Si LoginApp define build(), lo llamamos para inicializar la UI
