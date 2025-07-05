@@ -5,7 +5,12 @@ import shutil
 import requests
 import subprocess
 from pathlib import Path
+from kivy.config import Config
+# Esto desactiva el provider de lápiz digital (wm_pen)
+Config.set('kivy', 'input_exclude', 'wm_pen')
 
+# Esto configura el mouse y desactiva el multitouch simulado con el mouse
+Config.set('input', 'mouse', 'mouse,disable_multitouch')
 from kivy.metrics import sp
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -15,8 +20,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.app import App
-from kivy.config import Config
-Config.set('kivy', 'input_exclude', 'wm_pen')
+
 
 from Clases_y_Funciones.Clases.gestion_recursos import Recursos, RecursosExternos
 from Clases_y_Funciones.Funciones.basesql import init_local_db, init_local_tasas
