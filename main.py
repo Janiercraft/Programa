@@ -15,6 +15,8 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.anchorlayout import AnchorLayout
 from kivy.app import App
+from kivy.config import Config
+Config.set('kivy', 'input_exclude', 'wm_pen')
 
 from Clases_y_Funciones.Clases.gestion_recursos import Recursos, RecursosExternos
 from Clases_y_Funciones.Funciones.basesql import init_local_db, init_local_tasas

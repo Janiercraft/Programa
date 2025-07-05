@@ -1,5 +1,5 @@
 from kivy.config import Config
-Config.set('input', 'mouse', 'mouse,disable_multitouch')
+Config.set('input', 'mouse', 'mouse,disable_multitouch','kivy', 'input_exclude', 'wm_pen')
 from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics import Rectangle
 from kivy.uix.label import Label

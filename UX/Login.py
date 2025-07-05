@@ -1,5 +1,5 @@
 from kivy.config import Config
-Config.set('input', 'mouse', 'mouse,disable_multitouch')
+Config.set('input', 'mouse', 'mouse,disable_multitouch','kivy', 'input_exclude', 'wm_pen')
 from kivy.uix.popup import Popup
 from kivy.core.window import Window
 from kivy.app import App
