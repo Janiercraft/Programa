@@ -4,6 +4,8 @@ from Clases_y_Funciones.Funciones.basesql import (
     load_local_products,
 )
 from Clases_y_Funciones.Clases.GestionTasas import GestionTasas
+from decimal import Decimal, ROUND_HALF_UP
+
 
 _cache_key = None
 _cache_compra = 0.0
@@ -154,20 +156,20 @@ def pago_minimo_mensual(pares, cuota, meses):
     Raises:
       ValueError: si no se encuentra una tasa para el plazo indicado.
     """
-    # 1) Calculamos el saldo a financiar usando tu función existente
+    # 1) saldo a financiar
     saldo = saldo_a_financiar(pares, cuota)
 
-    # 2) Obtenemos el diccionario de tasas desde Mongo o cache local
+    # 2) obtén tasas y porcentaje
     service = GestionTasas(db_name='Royal', collection_name='tasas de interes')
     tasas = service.obtener_tasas()
-
-    # 3) Construimos la clave que coincida con la estructura de tu dict de tasas
-    #    en gestion_tasas.py guardas las claves 'plazo_6', 'plazo_12', etc.
     clave = f'plazo_{meses}'
     if clave not in tasas:
         raise ValueError(f"No existe tasa definida para un plazo de {meses} meses")
+    porcentaje = tasas[clave]    # e.g. 17.82
 
-    porcentaje = tasas[clave]    # por ejemplo 17.82 para 6 meses
+    # 3) cálculo con Decimal y redondeo half-up
+    raw = Decimal(saldo) * Decimal(porcentaje) / Decimal(100)
+    cuota_decimal = raw.quantize(Decimal('1'), rounding=ROUND_HALF_UP)
 
-    # 4) Pagamos el porcentaje sobre el saldo
-    return saldo * (porcentaje / 100.0)
+    # 4) devuelves entero o float, según convenga
+    return int(cuota_decimal)
