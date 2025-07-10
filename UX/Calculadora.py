@@ -1,28 +1,33 @@
 from kivy.config import Config
-# Esto desactiva el provider de lápiz digital (wm_pen)
+# Desactiva el provider de lápiz digital (wm_pen)
 Config.set('kivy', 'input_exclude', 'wm_pen')
-
-# Esto configura el mouse y desactiva el multitouch simulado con el mouse
+# Desactiva el multitouch simulado con el mouse
 Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.button import Button
+from kivy.uix.widget    import Widget
+from kivy.uix.button    import Button
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.core.window import Window
-from kivy.graphics import Color, Rectangle
+from kivy.uix.boxlayout  import BoxLayout
+from kivy.uix.label     import Label
+from kivy.core.window    import Window
+from kivy.graphics       import Color, Rectangle
 from kivy.uix.textinput import TextInput
-from kivy.uix.spinner import Spinner
-from kivy.clock import Clock
-from threading import Thread
+from kivy.uix.spinner   import Spinner
+from kivy.clock         import Clock
+from threading          import Thread
+
+from kivy.uix.screenmanager import Screen
+from kivy.app               import App
+
 from Clases_y_Funciones.Clases.gestion_recursos import Recursos
 from Clases_y_Funciones.Clases.botonToggleCustomizado import CustomToggleButton
-from Clases_y_Funciones.Funciones.calculos import calcular_precio_compra, calcular_precio_total, saldo_a_financiar, pago_minimo_mensual
-from kivy.uix.screenmanager import ScreenManager, Screen
-from UX.Resultados import ResultadosWidget
+from Clases_y_Funciones.Funciones.calculos import (
+    calcular_precio_compra,
+    calcular_precio_total,
+    saldo_a_financiar,
+    pago_minimo_mensual,
+)
 from Clases_y_Funciones.Clases.texto_dinamico import DynamicTextInput
 from Clases_y_Funciones.Clases.tamaño import ANCHO_INICIAL, ALTO_INICIAL, date_input_size
 from Clases_y_Funciones.Clases.tema_sistema import obtener_ruta_fondo, obtener_color_texto
@@ -33,15 +38,19 @@ from Clases_y_Funciones.Funciones.formatos_Fecha import on_date_text
 from Clases_y_Funciones.Funciones.tasas import obtener_plazos_meses
 import re
 
+# Icono de la ventana
 Window.set_icon(Recursos.ruta('calculadora.png'))
 
-class CalculoScreen(Screen):
-    """Contendrá tu MiWidget con dropdowns y botón Procesar."""
-    pass
 
-class ResultadosScreen(Screen):
-    """Aquí inyectaremos dinámicamente el ResultadosWidget."""
-    pass
+class CalculoScreen(Screen):
+    """
+    Contenedor para MiWidget. El name 'calculo' lo define main_app.py.
+    """
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.widget = MiWidget()
+        self.add_widget(self.widget)
+
 
 # --- Clase principal de la aplicación ---
 class MiWidget(Widget):
@@ -683,6 +692,8 @@ class MiWidget(Widget):
         Se ejecuta al pulsar el botón “Procesar”.
         Muestra un spinner, lanza el cálculo en un Thread y retorna de inmediato.
         """
+        # 0) Deshabilitar para que no puedan volver a pulsar
+        self.boton.disabled = True
         spinner_text = self.cuotas_spinner.text
         match = re.search(r'\d+', spinner_text)
         meses_seleccionados = int(match.group()) if match else 0
@@ -704,6 +715,7 @@ class MiWidget(Widget):
                 pares.append((c, d))
 
         if not pares:
+            self.boton.disabled = False
             return  # No hay productos válidos para procesar
 
         # 3) Lanzamos el thread para cálculos en background
@@ -769,55 +781,35 @@ class MiWidget(Widget):
         Oculta el spinner, crea el ResultadosWidget con los valores calculados
         y cambia la pantalla.
         """
-
-        # 2) Construimos el widget de resultados usando los valores calculados
-        widget_res = ResultadosWidget(
-            precio_compra       = resultados["precio_compra"],
-            precio_total        = resultados["precio_total"],
-            deposito_pagado     = resultados["deposito_pagado"],
-            saldo_a_financiar   = resultados["saldo_a_financiar"],
-            fecha_pago_adicional = resultados["fecha_pago_adicional"],
-            deposito_adicional  = resultados["deposito_adicional"],
-            estado_deposito     = resultados["estado_deposito"],
-            estado_pago_total   = resultados["estado_pago_total"],
-            meses_plazo      = resultados["meses_plazo"],
-            pago_minimo_mensual  = resultados["pago_minimo_mensual"]
-        )
-
-        # 3) Mostramos la pantalla de resultados
+        print("▶️ [Calculadora] _mostrar_resultados:", resultados)
         app = App.get_running_app()
-        res_screen = app.sm.get_screen('resultados')
-        res_screen.clear_widgets()
-        res_screen.add_widget(widget_res)
-        app.sm.current = 'resultados'
+        screen = app.root.get_screen('resultados')
+        screen.display_results(resultados)
+        self.boton.disabled = False
+        app.root.current = 'resultados'
 
-
-
-class MiApp(App):
-    def build(self):
-        self.title = "Calculadora Royal"
-        # 1) Crear el ScreenManager
-        sm = ScreenManager()
-        self.sm = sm  # para luego acceder desde MiWidget
-
-        # 2) Pantalla de cálculo
-        calc_screen = CalculoScreen(name='calculo')
-        calc_widget = MiWidget()
-        calc_screen.add_widget(calc_widget)
-        sm.add_widget(calc_screen)
-
-        # 3) Pantalla de resultados (vacía por ahora)
-        res_screen = ResultadosScreen(name='resultados')
-        sm.add_widget(res_screen)
-
-        return sm
-
-if __name__ == "__main__":
-     
-    try:
-        obtener_datos_productos()
-        print("[SYNC] Base local sincronizada con MongoDB")
-    except Exception as e:
-        print(f"[SYNC OFFLINE] No se pudo sincronizar: {e!r}")
-
-    MiApp().run()
+    def reset(self):
+            """
+            Limpia todos los inputs para una nueva simulación.
+            """
+            # 1) Campos principales:
+            self.codigo_input.text = ""
+            self.descripcion_input.text = ""
+            # 2) Pares extra:
+            for box, _, _ in list(self.extra_pairs):
+                self.grid_layout.remove_widget(box)
+            self.extra_pairs.clear()
+            # 3) Fecha y montos:
+            if hasattr(self, 'date_input'):
+                self.date_input.text = ""
+            if hasattr(self, 'monto_input'):
+                self.monto_input.text = ""
+            self.cuota_input.text = ""
+            # 4) Spinner de plazos:
+            if hasattr(self, 'cuotas_spinner') and self.cuotas_spinner.values:
+                self.cuotas_spinner.text = self.cuotas_spinner.values[0]
+            # 5) Toggles:
+            if hasattr(self, 'toggle_deposito'):
+                self.toggle_deposito.state = 'normal'
+            if hasattr(self, 'toggle_P_total'):
+                self.toggle_P_total.state = 'normal'
