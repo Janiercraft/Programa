@@ -1,6 +1,7 @@
 import sys
 import shutil
 from pathlib import Path
+from kivy.clock import Clock
 
 from kivy.config import Config
 Config.set('kivy', 'input_exclude', 'wm_pen')
@@ -90,8 +91,14 @@ class MainApp(App):
         return sm
 
     def on_start(self):
-        # La ventana ya está lista: comprobamos actualizaciones
+        # 1) Forzamos un “resize” al primer frame para que todos los layouts se recalculen
+        Clock.schedule_once(self._fix_layout, 0)
+        # 2) Luego comprobamos actualizaciones
         show_update_popup()
+
+    def _fix_layout(self, dt):
+        # Simula que el usuario redimensionó la ventana, disparando todos los binds on_resize
+        Window.dispatch('on_resize', Window.width, Window.height)
 
 
 if __name__ == "__main__":

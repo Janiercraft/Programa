@@ -1,26 +1,43 @@
 import os
+import sys
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
 def load_env():
+    """
+    Carga el archivo .env desde:
+      - la carpeta temporal de PyInstaller (sys._MEIPASS) si estamos en un exe --onefile
+      - o desde el directorio del script si estamos en desarrollo.
+    """
     try:
         from dotenv import load_dotenv
-        load_dotenv()
     except ImportError:
-        pass
+        return
+
+    # Determinar base_path según entorno
+    if getattr(sys, 'frozen', False):
+        # Ejecutable PyInstaller
+        base_path = sys._MEIPASS
+    else:
+        # Ejecución normal (fuente)
+        base_path = os.path.abspath(os.path.dirname(__file__))
+
+    env_path = os.path.join(base_path, '.env')
+    load_dotenv(dotenv_path=env_path)
+
 
 class Conexion_Mongo:
     """
     Clase reutilizable para conectar y operar con MongoDB Atlas.
 
-    Variables de entorno:
-      - MONGO_URI
-      - MONGO_DB
-      - MONGO_COLLECTION (opcional)
+    Variables de entorno soportadas en .env o en el entorno del sistema:
+      - MONGO_URI              (obligatoria)
+      - MONGO_DB               (obligatoria si no se pasa default_db)
+      - MONGO_COLLECTION       (opcional si no se pasa default_collection)
       - MONGO_SERVER_SELECTION_TIMEOUT_MS
       - MONGO_CONNECT_TIMEOUT_MS
       - MONGO_SOCKET_TIMEOUT_MS
-      - MONGO_CONNECT_ON_INIT (0 o 1)
+      - MONGO_CONNECT_ON_INIT  (0 o 1)
     """
 
     def __init__(
@@ -29,9 +46,12 @@ class Conexion_Mongo:
         default_db: str = None,
         default_collection: str = None
     ):
+        # Cargar .env si existe
         load_env()
-        self.uri = uri or os.getenv('MONGO_URI')
-        self.default_db = default_db or os.getenv('MONGO_DB')
+
+        # Leer configuración
+        self.uri              = uri or os.getenv('MONGO_URI')
+        self.default_db       = default_db or os.getenv('MONGO_DB')
         self.default_collection = default_collection or os.getenv('MONGO_COLLECTION')
 
         if not self.uri:
@@ -39,11 +59,11 @@ class Conexion_Mongo:
         if not self.default_db:
             raise ValueError("Falta MONGO_DB en entorno o argumento `default_db`.")
 
-        # Configuración de timeouts (milisegundos)
+        # Timeouts (milisegundos), con valores por defecto
         self.server_selection_timeout_ms = int(os.getenv('MONGO_SERVER_SELECTION_TIMEOUT_MS', 500))
-        self.connect_timeout_ms = int(os.getenv('MONGO_CONNECT_TIMEOUT_MS', 500))
-        self.socket_timeout_ms = int(os.getenv('MONGO_SOCKET_TIMEOUT_MS', 500))
-        self.connect_on_init = bool(int(os.getenv('MONGO_CONNECT_ON_INIT', 1)))
+        self.connect_timeout_ms          = int(os.getenv('MONGO_CONNECT_TIMEOUT_MS', 500))
+        self.socket_timeout_ms           = int(os.getenv('MONGO_SOCKET_TIMEOUT_MS', 500))
+        self.connect_on_init             = bool(int(os.getenv('MONGO_CONNECT_ON_INIT', 1)))
 
         self._client = None
         if self.connect_on_init:
@@ -60,7 +80,6 @@ class Conexion_Mongo:
             # Verificar conexión rápida
             self._client.admin.command('ping')
         except ConnectionFailure as e:
-            # No se pudo conectar, dejamos _client en None
             self._client = None
             raise ConnectionError(f"No se pudo conectar a MongoDB: {e}")
 
@@ -80,21 +99,17 @@ class Conexion_Mongo:
         return db[name]
 
     def insert_one(self, document: dict, collection_name: str = None, db_name: str = None):
-        coll = self.get_collection(collection_name, db_name)
-        return coll.insert_one(document)
+        return self.get_collection(collection_name, db_name).insert_one(document)
 
     def find(self, filter: dict, collection_name: str = None, db_name: str = None, *, limit: int = 0):
-        coll = self.get_collection(collection_name, db_name)
-        cursor = coll.find(filter)
+        cursor = self.get_collection(collection_name, db_name).find(filter)
         return list(cursor.limit(limit)) if limit else list(cursor)
 
     def update_one(self, filter: dict, update: dict, collection_name: str = None, db_name: str = None):
-        coll = self.get_collection(collection_name, db_name)
-        return coll.update_one(filter, {'$set': update})
+        return self.get_collection(collection_name, db_name).update_one(filter, {'$set': update})
 
     def delete_one(self, filter: dict, collection_name: str = None, db_name: str = None):
-        coll = self.get_collection(collection_name, db_name)
-        return coll.delete_one(filter)
+        return self.get_collection(collection_name, db_name).delete_one(filter)
 
     def close(self):
         """
@@ -103,6 +118,7 @@ class Conexion_Mongo:
         if self._client:
             self._client.close()
             self._client = None
+
 
 if __name__ == '__main__':
     con = Conexion_Mongo(default_db='Royal', default_collection='productos')
